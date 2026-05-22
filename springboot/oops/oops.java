@@ -1,18 +1,20 @@
 class cal{
     int a;
+    int b;
 
     public int add(int a,int b){
-        return a*b;
-
+       System.out.println(a+b);
+       return a*b;
     }
 }
 public class oops{
     public static void main(String[] args){
-        int a=34;
-        int b=3434;
+        int x=34;
+        int y=3434;
         cal c=new cal();
-        c.add(a,b);
+      int result =  c.add(x,y);
+      System.out.println(result);
 
-        
     }
 }
+    
