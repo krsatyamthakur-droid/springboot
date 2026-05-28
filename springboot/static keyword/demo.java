@@ -21,6 +21,9 @@ public Mobile(){
     name=null;
     network=null;
 }
+public static void show1(){
+    System.out.println("Static method show1 executed.");
+}
 }
 public class demo{
     public static void main(String[] args) {
@@ -50,5 +53,9 @@ public class demo{
    M3.network="5G";
 
    M3.displayDetails();
+   Mobile.show1();
+
    }
+
+  
 }
