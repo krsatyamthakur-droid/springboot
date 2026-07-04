@@ -78,3 +78,85 @@ Without a tool like Maven, you'd have to manage all of this by hand:
 6. **Run/use the built artifact** — for a plain jar,
    `java -jar target/my-app-1.0.jar`; for a Spring Boot app,
    `mvn spring-boot:run` is the common shortcut during development.
+
+## How to set up a Maven project with AWS
+
+Once `mvn package` gives you a runnable jar (e.g. a Spring Boot app), the
+simplest and most common way to get it running on AWS is to deploy it to an
+**EC2** instance. Broad steps:
+
+1. **Build the artifact locally first**
+   ```
+   mvn clean package
+   ```
+   This produces `target/my-app-1.0.jar`. Test it locally with
+   `java -jar target/my-app-1.0.jar` before touching AWS.
+
+2. **Launch an EC2 instance**
+   - Go to the AWS Console → EC2 → "Launch Instance".
+   - Pick an AMI (Amazon Linux 2023 or Ubuntu are common choices).
+   - Choose an instance type (`t2.micro`/`t3.micro` is enough for learning
+     and is free-tier eligible).
+   - Create/select a **key pair** (`.pem` file) — this is what lets you SSH
+     into the box, so keep it safe and never commit it to git.
+   - Configure the **Security Group** (basically a firewall):
+     - allow inbound **port 22** (SSH) from your IP
+     - allow inbound **port 8080** (or whatever port your app listens on)
+       from anywhere (`0.0.0.0/0`) if it should be publicly reachable
+
+3. **Connect to the instance**
+   ```
+   ssh -i my-key.pem ec2-user@<EC2_PUBLIC_IP>
+   ```
+
+4. **Install Java on the instance** (Maven itself isn't needed on the
+   server if you already built the jar locally — you only need a JRE to
+   run it):
+   ```
+   sudo yum install -y java-17-amazon-corretto   # Amazon Linux
+   # or: sudo apt install -y openjdk-17-jre-headless   # Ubuntu
+   ```
+
+5. **Copy the built jar to the instance**
+   ```
+   scp -i my-key.pem target/my-app-1.0.jar ec2-user@<EC2_PUBLIC_IP>:~
+   ```
+
+6. **Run the app on the instance**
+   ```
+   java -jar my-app-1.0.jar
+   ```
+   Visit `http://<EC2_PUBLIC_IP>:8080` in a browser to confirm it works.
+
+7. **Keep it running after you log out / on reboot** — running the jar
+   directly dies the moment you close the SSH session, so wrap it as a
+   `systemd` service instead:
+   ```ini
+   # /etc/systemd/system/my-app.service
+   [Unit]
+   Description=My Maven App
+   After=network.target
+
+   [Service]
+   ExecStart=/usr/bin/java -jar /home/ec2-user/my-app-1.0.jar
+   Restart=always
+   User=ec2-user
+
+   [Install]
+   WantedBy=multi-user.target
+   ```
+   Then:
+   ```
+   sudo systemctl enable my-app
+   sudo systemctl start my-app
+   ```
+
+**Alternative (less manual, more "AWS-native"):** instead of managing EC2
+by hand, you can deploy the same jar to **AWS Elastic Beanstalk**, which
+handles provisioning the server, load balancing, and restarts for you —
+you just upload the jar/zip through the console or `eb deploy` CLI and
+Beanstalk runs it. This trades manual control for convenience, which is
+usually the better trade-off once you're past the learning stage.
+
+
+
