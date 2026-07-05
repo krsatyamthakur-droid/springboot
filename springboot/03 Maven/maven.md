@@ -158,5 +158,120 @@ you just upload the jar/zip through the console or `eb deploy` CLI and
 Beanstalk runs it. This trades manual control for convenience, which is
 usually the better trade-off once you're past the learning stage.
 
+## Generating a project: `mvn archetype:generate`
 
+```
+mvn archetype:generate -DgroupId=com.telusko -DartifactId=telusko-app \
+    -DarchetypeArtifactId=maven-archetype-quickstart -DarchetypeVersion=1.0 \
+    -DinteractiveMode=false
+```
+
+This is the command that scaffolds a brand-new Maven project for you instead
+of creating folders and the `pom.xml` by hand. Breaking down each flag:
+
+- `archetype:generate` — the Maven goal that says "generate a new project
+  from a template."
+- `-DgroupId=com.telusko` — sets the project's Group ID (see below).
+- `-DartifactId=telusko-app` — sets the project's Artifact ID (see below) —
+  this also becomes the generated folder name.
+- `-DarchetypeArtifactId=maven-archetype-quickstart` — picks *which*
+  template to use. `maven-archetype-quickstart` is the classic "bare
+  minimum Java project" template (one sample class + one test class).
+- `-DarchetypeVersion=1.0` — pins the version of that template itself.
+- `-DinteractiveMode=false` — tells Maven not to ask you questions one by
+  one in the terminal; just use the values you already passed in and
+  generate the project immediately.
+
+## Maven Terminologies
+
+These are the core building blocks Maven uses to identify and describe a
+project — you'll see them constantly in `pom.xml` and in commands like the
+one above.
+
+- **Archetype** — a project *template/skeleton*. Instead of manually
+  creating `src/main/java`, `src/test/java`, and a starter `pom.xml`, you
+  tell Maven "use this archetype" and it generates that standard structure
+  for you, pre-filled with a sample class. Think of it as `create-react-app`
+  but for Maven/Java projects.
+- **Group ID** — identifies *who* the project belongs to, usually written
+  as a reversed domain name (e.g. `com.telusko`, `com.example`). It's the
+  same idea as a Java package name — it groups all of an organization's or
+  individual's projects together and avoids naming clashes with other
+  people's projects on the internet.
+- **Artifact ID** — the name of *this specific project/module*
+  (e.g. `telusko-app`). Combined with the Group ID, it uniquely identifies
+  the project — this pair is how other projects reference it as a
+  dependency, and it's also what names the final jar/war file
+  (`telusko-app-1.0.jar`).
+- **Version** — the release number of the project (e.g. `1.0`,
+  `1.0-SNAPSHOT`). `SNAPSHOT` versions mean "still under active
+  development, may change," while a plain number like `1.0` means a fixed,
+  released build.
+- **Packaging Type** — what kind of artifact this project produces:
+  `jar` (a plain runnable/library jar, the default), `war` (a web
+  application archive, deployed to a servlet container), or `pom` (a
+  project that exists only to group/manage other projects, no code of its
+  own).
+
+## Maven Dependencies, Goals, and Repositories
+
+- **Maven Dependencies** — the external libraries your project needs to
+  compile and run (e.g. Spring Boot, JUnit, Jackson). You declare them by
+  Group ID + Artifact ID + Version inside the `<dependencies>` tag of
+  `pom.xml`, and Maven takes care of downloading them (and anything *they*
+  depend on) automatically — you never manually hunt for `.jar` files.
+- **Maven Goals** — a *goal* is one specific unit of work Maven can carry
+  out, e.g. `compiler:compile`, `surefire:test`, or `jar:jar`. Goals belong
+  to plugins (the format is `plugin:goal`) and are the actual "verbs" that
+  do the work. A **phase** (like `compile` or `test`) is really just a
+  named bucket that one or more goals are bound to — when you run
+  `mvn test`, Maven is really running the goals bound to the `test` phase
+  (and every phase before it).
+- **Maven Repositories** — the storage locations Maven pulls dependencies
+  from and publishes artifacts to. There are three kinds:
+  - **Local repository** — a cache on your own machine, `~/.m2/repository`.
+    Maven always checks here first before going anywhere else.
+  - **Central repository** — the public, default repository
+    (repo.maven.apache.org) that hosts most open-source Java libraries.
+  - **Remote/private repository** — a custom repository your company or
+    team hosts (e.g. Nexus, Artifactory, AWS CodeArtifact) for internal
+    libraries that aren't meant to be public.
+
+## Installing Maven on Amazon Linux (EC2)
+
+Once you're SSH'd into an Amazon Linux EC2 instance, here's how to get
+Maven itself set up there (useful if you want to build the jar *on* the
+server instead of uploading a pre-built one):
+
+1. **Install Maven**
+   ```
+   sudo yum install maven -y
+   ```
+2. **Confirm the install and check the version**
+   ```
+   mvn -v
+   ```
+3. **Maven's config file** — Maven actually has two different config
+   files, and it's easy to mix them up:
+   - `pom.xml` — lives inside each project; describes *that project*
+     (its dependencies, plugins, version, etc.).
+   - `settings.xml` — lives outside any single project (usually
+     `~/.m2/settings.xml` or `$MAVEN_HOME/conf/settings.xml`); describes
+     *how Maven itself behaves on this machine* — which repositories to
+     use, mirrors, proxy settings, and credentials for private
+     repositories. It's shared across every project you build on that
+     machine.
+4. **Install `tree`** (not a Maven tool, just a handy Linux utility for
+   visualizing folder structures — useful for seeing the standard Maven
+   layout Maven generated for you):
+   ```
+   sudo yum install tree -y
+   ```
+5. **View a project's folder structure**
+   ```
+   tree <folder-name>
+   ```
+   This prints the full directory tree, which is a quick way to confirm
+   your `src/main/java`, `src/test/java`, and `pom.xml` are laid out the
+   way Maven expects.
 
