@@ -107,6 +107,58 @@ Har file/folder ka kaam:
    gradlew.bat build   # Windows
    ```
 
+## Gradle Wrapper kya hota hai?
+
+Ye ek bahut important cheez hai, isliye alag se achhe se samajhte hai.
+
+Socho tumne ek project banaya jisme **Gradle version 8.5** use kiya. Ab
+tumne ye project GitHub pe daal diya. Tumhara dost isko clone karta hai —
+lekin uske computer mein Gradle install hi nahi hai, ya phir uske paas
+**Gradle version 6** hai. Ab kya hoga? Ho sakta hai project uske system
+pe sahi se chale hi na, ya different version ki wajah se error aa jaaye.
+
+**Gradle Wrapper** isi problem ko solve karta hai. Ye ek chota script
+hai jo **project ke andar hi save** hota hai (`gradlew` aur
+`gradlew.bat`), aur jab bhi koi isse chalata hai:
+
+1. Ye check karta hai ki sahi Gradle version (jo project ko chahiye) us
+   computer pe already hai ya nahi.
+2. Agar nahi hai, to wrapper **khud us exact version ko internet se
+   download** kar leta hai (sirf ek baar, fir wo cache ho jaata hai).
+3. Uske baad wahi pinned version use karke build chalata hai.
+
+Isko aise socho jaise tumne apne dost ko tiffin diya, aur tiffin ke
+andar hi ek **recipe card** rakh di jisme likha hai "isse garam karne ke
+liye bilkul yehi wala microwave setting use karna" — ab dost ko khud
+guess nahi karna padta, sahi setting khud tiffin ke saath aa gayi.
+
+### Wrapper ke fayde (kyu use karte hai)
+
+- **Har jagah same Gradle version** — tumhare laptop pe, teammate ke
+  laptop pe, aur CI server pe — sabme exactly wahi Gradle version
+  chalega jo project ko chahiye. Koi "mere system pe to chal raha tha"
+  wala problem nahi hota.
+- **Gradle install karne ki zaroorat nahi** — naye developer ko bas
+  project clone karna hai aur `./gradlew build` chalana hai — Gradle
+  khud install nahi karna padta.
+- **Version upgrade karna easy hai** — jab naya Gradle version use karna
+  ho, bas ek command chalao aur wrapper config update ho jaata hai, sabko
+  automatically naya version mil jaata hai.
+
+### Wrapper ke andar kya-kya hota hai
+
+- **`gradlew`** — Mac/Linux ke liye shell script.
+- **`gradlew.bat`** — Windows ke liye batch script.
+- **`gradle/wrapper/gradle-wrapper.properties`** — isme likha hota hai
+  *exactly kaunsa* Gradle version use karna hai (jaise
+  `distributionUrl=...gradle-8.5-bin.zip`).
+- **`gradle/wrapper/gradle-wrapper.jar`** — chota helper program jo
+  download aur setup ka kaam karta hai.
+
+Isliye jab bhi Gradle project use karo, hamesha `gradle build` ki jagah
+`./gradlew build` chalao — apne system ke Gradle ki jagah project ke apne
+pinned version ka use hota hai, aur consistent result milta hai.
+
 ## `build.gradle` ka example (is project ka)
 
 ```groovy
