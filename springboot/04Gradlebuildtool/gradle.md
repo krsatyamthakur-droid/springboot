@@ -211,6 +211,99 @@ application {
 - **`application { mainClass = ... }`** — jab `gradlew run` chalao, to
   Gradle ko pata chal jaata hai kaunsi class se program start karna hai.
 
+## `build.gradle` ka example — ek Spring Boot project ke liye
+
+Upar wala example ek **plain Java CLI app** ka tha. Ab dekhte hai Gradle
+ka use ek **Spring Boot web application** ke liye kaise hota hai — ye
+wala style bahut common milega jab tum Spring Boot projects banaoge:
+
+```groovy
+plugins {
+    id 'org.springframework.boot' version '3.3.2'
+    id 'io.spring.dependency-management' version '1.1.6'
+    id 'java'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    sourceCompatibility = '17'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+tasks.test {
+    useJUnitPlatform()
+}
+```
+
+Ab isko line-by-line, achhe se samjhte hai:
+
+- **`plugins { ... }`** — teen plugins "on" kiye gaye hai:
+  - `org.springframework.boot` (version `3.3.2`) — ye plugin Spring Boot
+    ke special kaam karta hai: sab dependencies ka version khud manage
+    karta hai, aur ek **executable "fat jar"** banata hai (jisme tumhara
+    code + saari dependencies ek hi jar ke andar pack ho jaati hai, taaki
+    seedha `java -jar app.jar` se chala sako).
+  - `io.spring.dependency-management` (version `1.1.6`) — ye Maven ke
+    "BOM" (Bill of Materials) jaisa kaam karta hai — Spring Boot ke saare
+    starters (web, test, data-jpa, etc.) ke versions ko **compatible aur
+    sync** rakhta hai, taaki tumhe har library ka version khud select na
+    karna pade aur conflict na ho.
+  - `java` — batata hai ye ek Java project hai, isliye `compileJava`,
+    `test` jaise standard Java tasks available ho jaate hai.
+
+- **`group = 'com.example'`** — Maven ke Group ID jaisa hi hai — batata
+  hai project **kis company/organization** ka hai.
+
+- **`version = '0.0.1-SNAPSHOT'`** — project ka version number.
+  `SNAPSHOT` ka matlab hai "abhi development chal raha hai, final
+  release nahi hua" — bilkul Maven wale concept jaisa hi.
+
+- **`java { sourceCompatibility = '17' }`** — batata hai code kis Java
+  version ke syntax/features follow karega, aur `.class` files usi
+  version ke liye banengi. Isko Maven ke `maven.compiler.source` jaisa
+  socho.
+
+- **`repositories { mavenCentral() }`** — dependencies **kahan se**
+  download karni hai, wahi Maven Central repository use ho raha hai
+  (lakhon open-source libraries yahan milti hai).
+
+- **`dependencies { ... }`** — is project ko chahiye hone wali libraries:
+  - `implementation 'org.springframework.boot:spring-boot-starter-web'`
+    — Spring Boot ka **web starter**, jisme Spring MVC, embedded Tomcat
+    server, JSON handling waghera sab kuch ek saath aa jaata hai — isse
+    tum REST APIs bana sakte ho. `implementation` ka matlab: ye library
+    compile time aur run time dono waqt chahiye.
+  - `testImplementation 'org.springframework.boot:spring-boot-starter-test'`
+    — sirf **tests likhne/chalane** ke liye chahiye hone wala starter
+    (JUnit, Mockito, AssertJ waghera bundle karta hai). `testImplementation`
+    Maven ke `test` scope jaisa hi hai — final app ke andar ye nahi
+    jaata.
+
+- **`tasks.test { useJUnitPlatform() }`** — Gradle ke built-in `test`
+  task ko configure kar rahe hai, taaki wo **JUnit 5** (JUnit Platform)
+  use karke tests dhundhe aur chalaye. Bina ye line ke, Gradle purane
+  JUnit 4 style ko expect karega aur naye JUnit 5 tests miss ho sakte
+  hai.
+
+### Ye Spring Boot wala style pehle wale (plain Java) example se kaise alag hai
+
+| | Plain Java app (upar wala pehla example) | Spring Boot app (ye wala) |
+|---|---|---|
+| Plugin | `application` | `org.springframework.boot` + `io.spring.dependency-management` |
+| Dependency version | khud likhna padta hai (jaise `libs.guava`) | Spring Boot plugin khud sahi compatible version choose kar deta hai |
+| Final jar | seedha jar, dependencies alag rehti hai | "fat jar" — code + saari dependencies ek hi jar ke andar |
+| Chalane ka tarika | `mainClass` set karke `gradlew run` | `gradlew bootRun`, ya jar bana ke `java -jar app.jar` |
+
 ## Extra info: Gradle Tasks (kaam ke units)
 
 Maven mein "phases/goals" hote hai, Gradle mein sab kuch **task** kehlata
