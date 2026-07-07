@@ -1,59 +1,60 @@
-# Maven (dost wali language mein samjho)
+# Maven (ekdum simple bhasha mein, jaise ek chote bacche ko samjhaya jaata hai)
 
 ## Maven hai kya?
 
-Bhai simple bhasha mein — Maven ek **build tool** hai jo Java project ka pura
-kaam-kaaj sambhalta hai. Socho tumhe koi project banana hai, usme bahut saari
-libraries chahiye, code compile karna hai, test chalane hai, phir sab kuch
-ek `.jar` ya `.war` file mein pack karna hai. Ye sab manually karna bahut
-pakau kaam hai. Maven ye sab khud kar deta hai, bas usko bata do "kya chahiye"
-aur wo laake de deta hai.
+Socho tumhe Lego se ek gaadi banani hai. Tumhe pehle sare parts chahiye,
+phir unhe sahi tarike se jodna hai, phir check karna hai sab sahi lag raha
+hai ya nahi. Maven bhi bilkul yehi karta hai, bas Lego blocks ki jagah
+**Java code** ke saath.
 
-Har Maven project ke andar ek `pom.xml` file hoti hai (Project Object Model).
-Ye file basically project ka "resume" hai — isme likha hota hai:
-- project ka naam, version, aur type (jar hai ya war hai)
-- **dependencies** — matlab kaunsi external libraries chahiye (jaise Spring, JUnit)
-- **plugins** — extra kaam karne ke liye (jaise specific Java version pe compile
-  karna, tests chalana, executable jar banana)
+Maven ek **tool** hai jo:
+1. Tumhare project ko chahiye hone wali saari cheezein (libraries) khud
+   dhundh ke laa deta hai.
+2. Tumhara code compile (ready) karta hai.
+3. Test karta hai sab sahi chal raha hai ya nahi.
+4. Aakhir mein sab kuch ek box (`.jar` ya `.war` file) mein pack kar deta
+   hai, jise chalaya ja sake.
+
+Agar ye sab tumhe khud haath se karna pade, to bahut time lagega aur
+galtiyan bhi ho sakti hai. Isliye Maven use karte hai — bas usse bata do
+"mujhe ye chahiye" aur wo sab kaam khud kar deta hai.
+
+Har Maven project ke andar ek `pom.xml` naam ki file hoti hai (Project
+Object Model). Ye file project ka **ID card** hai — isme likha hota hai:
+- project ka naam, version, aur type (jar hai ya war)
+- **dependencies** — konsi extra libraries chahiye (jaise Spring, JUnit)
+- **plugins** — extra kaam karne ke liye (jaise specific Java version pe
+  compile karna)
 
 ## Maven use kyu karte hai?
 
-Agar Maven na ho to ye sab tumhe haath se karna padega, aur wo bhi bada
-headache wala kaam hai:
+Agar Maven na ho, to:
 
-1. **Dependency management** — Java projects mein bahar ki libraries lagti
-   hai. Har ek `.jar` file ko manually dhundhna, download karna, aur unki
-   apni dependencies bhi manage karna — bohot jhanjhat hai. Maven `pom.xml`
-   padhta hai, exact wahi libraries (aur unki dependencies) khud download
-   karke classpath mein daal deta hai.
-2. **Same folder structure har jagah** — Har Maven project ka folder layout
-   same hota hai (`src/main/java`, `src/test/java`, `src/main/resources`).
-   Ek baar samajh liya, to har Maven project mein ghus sakte ho bina kisi
-   confusion ke — "code kahan hai" ye sochna hi nahi padta.
-3. **Build hamesha same result deta hai** — `mvn install` chalao apne laptop
-   pe ya teammate ke laptop pe ya CI server pe — result same aayega, kyuki
-   sab kuch `pom.xml` mein already likha hai, "jo mann kare wo command"
-   wala scene nahi hai.
-4. **Sab kaam ek jagah automate** — compile, test, package, deploy — sab
-   ek hi command se ho jaata hai, alag-alag steps manually nahi karne
-   padte.
-5. **Easily extend kar sakte ho** — Plugins add karke naye features la
-   sakte ho (code coverage, Docker image banana, etc.) bina apna build
-   process badle.
+1. **Libraries khud dhundhni padegi** — har ek `.jar` file manually
+   download karni padegi, aur unki apni dependencies bhi khud sambhalni
+   padegi. Bohot jhanjhat hai. Maven `pom.xml` padh ke sab khud download
+   kar leta hai.
+2. **Har project ka structure same rehta hai** — ek baar samajh liya, to
+   har Maven project mein confuse nahi hoge ki "code kahan rakha hai".
+3. **Build hamesha same result deta hai** — chahe tumhare laptop pe chalao
+   ya dost ke laptop pe, result same aayega.
+4. **Sab kaam ek hi jagah se ho jaata hai** — compile, test, package, sab
+   ek hi command se.
+5. **Naye features add karna easy hai** — plugins add karke.
 
 ## Maven use karne ke steps
 
-1. **Maven install karo** aur check karo PATH mein hai ya nahi:
+1. **Maven install karo** aur check karo sahi se install hua ya nahi:
    ```
    mvn -version
    ```
-2. **Naya project banao** (quickstart template se), ya jo already
+2. **Naya project banao** (ek ready-made template se), ya jo already
    `pom.xml` wala project hai wo kholo:
    ```
    mvn archetype:generate -DgroupId=com.example -DartifactId=my-app \
        -DarchetypeArtifactId=maven-archetype-quickstart -DinteractiveMode=false
    ```
-3. **Folder structure samjho** jo Maven expect karta hai:
+3. **Folder structure samjho** jo Maven khud banata hai:
    ```
    my-app/
    ├── pom.xml
@@ -62,25 +63,202 @@ headache wala kaam hai:
        │   ├── java/        <- tumhara actual code yahan
        │   └── resources/   <- config files waghera yahan
        └── test/
-           └── java/        <- test code yahan
+           └── java/        <- test wala code yahan
    ```
 4. **Dependencies daalo** `pom.xml` ke `<dependencies>` tag ke andar
-   (jaise Spring Boot starter, JUnit) — Maven khud download kar lega.
+   (jaise Spring Boot, JUnit) — Maven khud download kar lega.
 5. **Project build karo** — project ke root folder se (jahan `pom.xml`
    hai) ye commands chalao:
-   - `mvn compile` — sirf code compile karta hai
-   - `mvn test` — saare unit tests chalata hai
+   - `mvn compile` — sirf code compile karta hai (ready karta hai)
+   - `mvn test` — saare tests chalata hai
    - `mvn package` — compiled code ko `.jar`/`.war` bana ke `target/`
      folder mein daal deta hai
-   - `mvn install` — us package ko apne local Maven repo
-     (`~/.m2`) mein daal deta hai, taaki dusre local projects bhi ise
+   - `mvn install` — us package ko apne local Maven ghar
+     (`~/.m2`) mein rakh deta hai, taaki dusre local projects bhi ise
      use kar sake
    - `mvn clean` — `target/` folder delete karke fresh start deta hai
-   (Har step apne se pehle wale steps bhi khud chala deta hai — jaise
+   (Har command apne se pehle wale steps bhi khud kar leta hai — jaise
    `mvn package` chalane se pehle compile aur test bhi ho jaate hai.)
-6. **Bana hua jar chalao** — plain jar ke liye:
-   `java -jar target/my-app-1.0.jar`; Spring Boot app ke liye
-   `mvn spring-boot:run` seedha shortcut hai development ke time.
+6. **Bana hua jar chalao**:
+   ```
+   java -jar target/my-app-1.0.jar
+   ```
+   Spring Boot app ke liye `mvn spring-boot:run` seedha shortcut hai.
+
+## Archetype kya hota hai?
+
+**Archetype** ek **ready-made template** hai jo batata hai naya Maven
+project kaise dikhega (kaunse folders honge, kaunsi starting files
+honge). Isko aise socho jaise kisi form ka **printed format** hota hai —
+tumhe bas blanks fill karne hai, poora form khud se nahi banana padta.
+
+Do common archetypes:
+- `maven-archetype-quickstart` → simple, standalone Java application ke
+  liye (koi website nahi, bas normal Java program).
+  ```
+  mvn archetype:generate -DgroupId=com.example -DartifactId=my-app \
+      -DarchetypeArtifactId=maven-archetype-quickstart -DarchetypeVersion=1.0 \
+      -DinteractiveMode=false
+  ```
+- `maven-archetype-webapp` → Java **web application** ke liye (jo browser
+  mein khulti hai).
+  ```
+  mvn archetype:generate -DgroupId=com.telusko -DartifactId=telusko-web-app \
+      -DarchetypeArtifactId=maven-archetype-webapp -DarchetypeVersion=1.0 \
+      -DinteractiveMode=false
+  ```
+
+## Maven Terminologies (chote-chote basic naam)
+
+- **Group ID** — batata hai project **kiski company/organization** ka hai.
+  Ye ulta domain naam ki tarah likha jaata hai (jaise `com.tcs`,
+  `com.ibm`, `com.telusko`). Isko school ke naam ki tarah socho — batata
+  hai ye project kis "school" (company) se hai.
+- **Artifact ID** — is **particular project ya module** ka naam (jaise
+  `telusko-app`, `amazon-app`). Isko tumhare apne naam ki tarah socho —
+  batata hai *exactly kaunsa* project hai.
+- **Version** — project ka number, jaise kis "class" mein hai
+  (`1.0`, `2.0`, ya `1.0-SNAPSHOT`). `SNAPSHOT` ka matlab hai "abhi bhi
+  bana raha hu, final nahi hua" — jaise homework abhi complete nahi hua.
+  Plain number jaise `1.0` ka matlab "ye final, ready version hai".
+- **Packaging Type** — project akhir mein kis **dabbe (box)** mein pack
+  hoga: `jar` (normal Java program ke liye, sabse common), `war` (web
+  application ke liye), ya `pom` (sirf doosre projects ko group karne ke
+  liye, khud ka code nahi hota).
+
+## Maven Dependencies (extra cheezein jo chahiye)
+
+**Dependencies** wo external libraries hai jo tumhare project ko chalne
+ke liye chahiye — jaise school bag mein pencil aur eraser chahiye hote
+hai, waise hi project ko Spring, Hibernate, JUnit, Kafka, Redis jaisi
+cheezein chahiye ho sakti hai.
+
+Ye libraries kahan se milti hai? [mvnrepository.com](https://mvnrepository.com)
+pe jaake dhundh sakte ho, aur wahan se copy karke `pom.xml` mein
+`<dependencies>` tag ke andar daal do:
+
+```xml
+<dependencies>
+    <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-core</artifactId>
+        <version>6.1.7</version>
+    </dependency>
+</dependencies>
+```
+
+Isko daalte hi Maven khud us library ko download karke tumhare project
+mein use karne layak bana deta hai — tumhe kahin se `.jar` file khud
+dhundhni nahi padti.
+
+## Maven Phases aur Goals (build ke steps)
+
+Maven build ek **lifecycle** follow karta hai — matlab ek fixed order
+mein steps hote hai. Ye steps ("phases") kuch aise hai:
+
+```
+clean → compile → test → package → install → deploy
+```
+
+- **Phase** ek **stage/step** ka naam hai (jaise `compile`, `test`,
+  `package`). Jab tum `mvn package` likhte ho, Maven apne aap us se pehle
+  wale saare phases (compile, test) bhi chala deta hai.
+- **Goal** ek **chota, specific kaam** hai jo kisi phase ke andar actually
+  hota hai (jaise `compiler:compile`, `surefire:test`). Command hota hai:
+  ```
+  mvn <goal>
+  ```
+  Ek phase ke andar ek ya zyada goals chupe hote hai — phase bas ek label
+  hai, goal wo asli kaam hai jo ho raha hai.
+
+### `mvn compile` aur `mvn clean` mein farak
+
+- `mvn compile` — tumhara `.java` code check karke `.class` files banata
+  hai aur unhe `target/` folder mein rakh deta hai.
+- `mvn clean` — us `target/` folder ko **delete** kar deta hai, taaki
+  agli baar fresh, saaf-suthri build ho.
+- `mvn package` — compile + test karne ke baad sab kuch ek `.jar`/`.war`
+  file mein wrap kar deta hai, taaki chalane/distribute karne layak ho
+  jaaye.
+- `mvn clean package` — pehle purani `target/` folder delete hoti hai
+  (`clean`), fir usi jagah bilkul **naya, fresh jar/war** ban ke aata hai
+  (`package`). Ye "delete karke package ko khatam" nahi karta — ulta, ye
+  purana build hata ke ek naya, sahi build bana deta hai.
+
+## `pom.xml` ka example (sab kuch ek jagah)
+
+```xml
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.telusko</groupId>
+    <artifactId>telusko-app</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <name>telusko-app</name>
+    <url>http://maven.apache.org</url>
+
+    <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>3.8.1</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.13.0</version>
+                <configuration>
+                    <source>17</source>
+                    <target>17</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
+```
+
+Isko edit karne ke liye terminal mein `vi pom.xml` likh ke seedha khol
+sakte ho. Har tag ka matlab upar "Maven Terminologies" section mein
+already explain ho chuka hai (groupId, artifactId, version, packaging,
+dependencies).
+
+## Maven Repositories (dependencies kahan store hoti hai)
+
+Repository ek **gudaam/warehouse** jaisi jagah hai jahan Maven
+dependencies (libraries) rakhta hai aur wahan se uthata hai. Teen type
+hote hai:
+
+1. **Local Repository** — tumhare **apne machine** pe hota hai, folder
+   ka naam `~/.m2/repository`. Jo bhi library ek baar download ho jaati
+   hai, wo yahan save ho jaati hai — taaki dubara chahiye to Maven use
+   direct yahan se utha le, dubara internet se download na kare.
+2. **Central Repository** — Maven ka **official, public** online
+   warehouse (`repo.maven.apache.org/maven2`), jahan lakhon open-source
+   libraries pehle se rakhi hai. Agar library tumhare local repo mein
+   nahi milti, Maven yahan dhundhta hai.
+3. **Remote/Private Repository** — kisi **company ya team ka apna**
+   private server (jaise Nexus, Artifactory, AWS CodeArtifact), jo
+   `pom.xml` ya `settings.xml` mein define kiya jaata hai. Company apni
+   internal libraries yahan rakhti hai jo public nahi honi chahiye.
+   Config ke hisaab se Maven ise central repo se pehle ya baad mein
+   check karta hai.
 
 ## AWS pe Maven project kaise set up kare
 
@@ -162,88 +340,6 @@ Ye server provision karna, load balancing, restarts — sab khud sambhal
 leta hai — bas jar/zip console se ya `eb deploy` CLI se upload karna hai.
 Thoda control kam milta hai lekin kaafi convenient hai, jab seekhna kaafi
 ho jaaye tab is approach pe switch karna better hota hai.
-
-## Project generate karna: `mvn archetype:generate`
-
-```
-mvn archetype:generate -DgroupId=com.telusko -DartifactId=telusko-app \
-    -DarchetypeArtifactId=maven-archetype-quickstart -DarchetypeVersion=1.0 \
-    -DinteractiveMode=false
-```
-
-Ye command naya Maven project bana deti hai automatically, taaki tumhe
-manually folder banana aur `pom.xml` likhna na pade. Har flag ka matlab:
-
-- `archetype:generate` — Maven ka goal jo bolta hai "template se naya
-  project bana do."
-- `-DgroupId=com.telusko` — project ka Group ID set karta hai (niche
-  explain hai).
-- `-DartifactId=telusko-app` — project ka Artifact ID set karta hai — yahi
-  generated folder ka naam bhi ban jaata hai.
-- `-DarchetypeArtifactId=maven-archetype-quickstart` — batata hai kaunsa
-  template use karna hai. `maven-archetype-quickstart` sabse basic wala
-  template hai (ek sample class + ek test class ke saath).
-- `-DarchetypeVersion=1.0` — us template ka version fix karta hai.
-- `-DinteractiveMode=false` — Maven ko bolta hai "terminal mein ek-ek
-  sawaal mat pooch, jo values already de di hai unhi se seedha project bana
-  de."
-
-## Maven Terminologies (basic terms samjho)
-
-Ye woh building blocks hai jo Maven project ko identify karne ke liye use
-hote hai — inhe `pom.xml` mein aur upar wale command mein baar baar
-dekhoge.
-
-- **Archetype** — ek project ka *template/skeleton*. Manually
-  `src/main/java`, `src/test/java` folder aur starter `pom.xml` banane ke
-  bajaye, Maven ko bolo "ye archetype use karo" aur wo pura standard
-  structure khud bana deta hai, sample class ke saath. Isko aise socho jaise
-  `create-react-app` hota hai React ke liye, waisa hi ye Maven/Java ke
-  liye hai.
-- **Group ID** — batata hai ye project *kiska* hai, usually reversed domain
-  name ki tarah likha jata hai (jaise `com.telusko`, `com.example`). Java
-  package naam jaisa hi concept hai — isse pata chalta hai ye kis company
-  ya person ka project hai, aur naming clash nahi hota doosre logo ke
-  projects se.
-- **Artifact ID** — *is particular project/module* ka naam (jaise
-  `telusko-app`). Group ID ke saath milke ye project ko uniquely identify
-  karta hai — koi aur project ise dependency ki tarah isi combo se refer
-  karta hai, aur final jar/war file ka naam bhi isi se banta hai
-  (`telusko-app-1.0.jar`).
-- **Version** — project ka release number (jaise `1.0`, `1.0-SNAPSHOT`).
-  `SNAPSHOT` ka matlab "abhi bhi development mein hai, badal sakta hai",
-  aur plain number jaise `1.0` ka matlab "fixed, release ho chuka build".
-- **Packaging Type** — ye project final mein kya banega: `jar` (plain
-  runnable/library jar, default hota hai), `war` (web application, servlet
-  container mein deploy hota hai), ya `pom` (aisa project jo sirf doosre
-  projects ko group/manage karne ke liye hai, khud ka code nahi hota).
-
-## Maven Dependencies, Goals, aur Repositories
-
-- **Maven Dependencies** — external libraries jo tumhare project ko compile
-  aur run karne ke liye chahiye (jaise Spring Boot, JUnit, Jackson). Inhe
-  Group ID + Artifact ID + Version ke through `pom.xml` ke
-  `<dependencies>` tag mein likhte ho, aur Maven khud download kar leta hai
-  (aur unki dependencies bhi) — kabhi manually `.jar` file dhundhni nahi
-  padti.
-- **Maven Goals** — ek *goal* matlab Maven ka ek specific kaam, jaise
-  `compiler:compile`, `surefire:test`, ya `jar:jar`. Goals plugins ke
-  andar hote hai (format hota hai `plugin:goal`) aur yahi asli "verb" hai
-  jo actual kaam karta hai. Ek **phase** (jaise `compile` ya `test`)
-  basically ek naam ka bucket hai jisme ek ya zyada goals bind hote hai —
-  jab tum `mvn test` chalate ho, to Maven asal mein `test` phase se jude
-  hue saare goals chala raha hota hai (aur usse pehle wale saare phases
-  ke bhi).
-- **Maven Repositories** — wo jagah jahan se Maven dependencies leke aata
-  hai aur artifacts publish karta hai. Teen type hote hai:
-  - **Local repository** — tumhare apne machine pe cache,
-    `~/.m2/repository`. Maven sabse pehle yahi check karta hai.
-  - **Central repository** — public, default repository
-    (repo.maven.apache.org), jahan zyada tar open-source Java libraries
-    milti hai.
-  - **Remote/private repository** — company/team ka apna custom repo
-    (jaise Nexus, Artifactory, AWS CodeArtifact), internal libraries ke
-    liye jo public nahi honi chahiye.
 
 ## Amazon Linux (EC2) pe Maven install karna
 
