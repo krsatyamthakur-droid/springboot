@@ -189,6 +189,31 @@ Jab tum koi bhi phase chalate ho (jaise `mvn package`), Maven us se
 `mvn package` likhne se validate, compile, aur test bhi apne aap ho
 jaate hai, tumhe alag se likhna nahi padta.
 
+### Flow chart (GitHub pe seedha diagram dikhega)
+
+```mermaid
+flowchart TB
+    subgraph Maven Build Lifecycle
+        direction LR
+        V[validate] --> C[compile] --> T[test] --> P[package] --> VF[verify] --> I[install] --> D[deploy]
+    end
+
+    CL[clean lifecycle\nsirf target/ folder delete karta hai]
+    S[site lifecycle\ndocumentation generate karta hai]
+
+    CL -.optional, pehle chalao.-> V
+    D -.-> S
+```
+
+- Upar wali seedhi line (`validate → ... → deploy`) **default**
+  lifecycle hai — ye asli build ka kaam karti hai.
+- `clean` alag lifecycle hai, jo chaho to `default` se pehle chala sakte
+  ho (jaise `mvn clean install`) taaki purana `target/` folder pehle hat
+  jaaye.
+- `site` bhi apna alag lifecycle hai, documentation banane ke liye —
+  isko `default` ke saath jodne ki zaroorat nahi, jab chaho tab alag se
+  `mvn site` chala sakte ho.
+
 - **Phase** ek **stage/step** ka naam hai (jaise `compile`, `test`,
   `package`).
 - **Goal** ek **chota, specific kaam** hai jo kisi phase ke andar actually
