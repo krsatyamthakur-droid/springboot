@@ -151,20 +151,49 @@ Isko daalte hi Maven khud us library ko download karke tumhare project
 mein use karne layak bana deta hai — tumhe kahin se `.jar` file khud
 dhundhni nahi padti.
 
-## Maven Phases aur Goals (build ke steps)
+## Maven Build Lifecycle (build ke steps)
 
-Maven build ek **lifecycle** follow karta hai — matlab ek fixed order
-mein steps hote hai. Ye steps ("phases") kuch aise hai:
+Maven mein **3 alag lifecycles** hote hai — inhe socho jaise 3 alag
+"to-do lists", jo apna kaam khatam karke apna result deti hai:
+
+1. **default** — sabse important lifecycle, jisse tumhara **application
+   actually build hota hai** (compile, test, package waghera). Ye hi
+   sabse zyada use hota hai.
+2. **clean** — sirf ek kaam karta hai: `target/` directory ko **saaf**
+   (delete) kar deta hai, taaki purani build ka kachra na rahe.
+3. **site** — tumhare project ki **documentation** (website jaisi report)
+   generate karta hai.
+
+`default` lifecycle ke andar 7 phases hote hai, hamesha isi order mein
+chalte hai:
 
 ```
-clean → compile → test → package → install → deploy
+validate → compile → test → package → verify → install → deploy
 ```
+
+- **validate** — check karta hai project ka structure sahi hai, sab
+  info (jaise `pom.xml`) correct hai ya nahi.
+- **compile** — `.java` files ko `.class` files mein badalta hai.
+- **test** — likhe hue unit tests chala ke check karta hai code sahi
+  kaam kar raha hai ya nahi.
+- **package** — compiled code ko `.jar`/`.war` file mein wrap karta hai.
+- **verify** — package ke checks/validations karta hai ki wo sahi bana
+  hai aur quality theek hai.
+- **install** — us package ko apne local repo (`~/.m2`) mein daal deta
+  hai, taaki dusre local projects use kar sake.
+- **deploy** — final package ko ek shared/remote repository pe bhej deta
+  hai, taaki dusre developers ya servers bhi use kar sake.
+
+Jab tum koi bhi phase chalate ho (jaise `mvn package`), Maven us se
+**pehle wale saare phases bhi khud chala deta hai** — matlab
+`mvn package` likhne se validate, compile, aur test bhi apne aap ho
+jaate hai, tumhe alag se likhna nahi padta.
 
 - **Phase** ek **stage/step** ka naam hai (jaise `compile`, `test`,
-  `package`). Jab tum `mvn package` likhte ho, Maven apne aap us se pehle
-  wale saare phases (compile, test) bhi chala deta hai.
+  `package`).
 - **Goal** ek **chota, specific kaam** hai jo kisi phase ke andar actually
-  hota hai (jaise `compiler:compile`, `surefire:test`). Command hota hai:
+  hota hai (jaise `compiler:compile`, `surefire:test`). Seedha ek goal
+  chalane ka command hota hai:
   ```
   mvn <goal>
   ```
