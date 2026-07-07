@@ -314,6 +314,125 @@ hote hai:
    Config ke hisaab se Maven ise central repo se pehle ya baad mein
    check karta hai.
 
+## Dependency Scope (kaunsi library kab chahiye)
+
+Har dependency ke andar ek `<scope>` tag daal sakte ho, jo batata hai ye
+library **kab kab** use hogi. Isko aise socho jaise school mein kuch
+cheezein sirf exam ke din chahiye hoti hai, kuch roz chahiye hoti hai:
+
+- **compile** (default, agar kuch likha hi na ho) — har jagah chahiye:
+  code likhte waqt, test karte waqt, aur final jar chalte waqt bhi. Ye
+  sabse "hamesha saath rehne wali" scope hai.
+- **provided** — code likhte aur test karte waqt chahiye, lekin final jar
+  mein iski zaroorat nahi kyuki jahan app chalegi wahan ye pehle se maujood
+  hogi (jaise Servlet API — jo Tomcat server khud provide karta hai).
+- **runtime** — code compile karte waqt zaroorat nahi, lekin app **chalte
+  waqt** chahiye (jaise database driver, e.g. MySQL Connector).
+- **test** — sirf tests likhne/chalane ke liye chahiye (jaise JUnit,
+  Mockito) — final app ke andar ye jaati hi nahi.
+- **system** — `provided` jaisa hi hai, bas library Maven repo se nahi,
+  tumhare **computer ke ek fixed local path** se aati hai (bahut kam use
+  hota hai aajkal).
+
+```xml
+<dependency>
+    <groupId>mysql</groupId>
+    <artifactId>mysql-connector-j</artifactId>
+    <version>8.3.0</version>
+    <scope>runtime</scope>
+</dependency>
+```
+
+## Transitive Dependencies (dependency ki apni dependency)
+
+Maan lo tumne apne project mein sirf **A** library daali. Lekin A ko khud
+chalne ke liye **B** aur **C** libraries chahiye. Tumhe B aur C manually
+daalne ki zaroorat nahi — Maven khud samajh ke unhe bhi download kar leta
+hai. Inhe **transitive dependencies** kehte hai.
+
+Isko family tree jaisa socho: tumne A ko invite kiya party mein, aur A
+apne saath apne dost B aur C ko bhi le aaya — tumhe unhe alag se invite
+nahi karna pada.
+
+Kabhi kabhi isse do libraries ka version clash ho jaata hai (dono ko
+alag-alag version chahiye hota hai kisi common dependency ka) — isko
+**dependency conflict** kehte hai, aur Maven apne rules se decide karta
+hai kaunsa version final use hoga (usually jo "sabse nazdeek" declare kiya
+gaya ho).
+
+## Maven Plugins (extra powers add karna)
+
+Pehle humne `maven-compiler-plugin` dekha tha (Java version set karne ke
+liye). Kuch aur commonly use hone wale plugins:
+
+- **maven-surefire-plugin** — `test` phase ke andar ye hi plugin hai jo
+  actually tumhare unit tests dhundh ke chalata hai.
+- **maven-shade-plugin** / **spring-boot-maven-plugin** — ek **"fat jar"**
+  (uber jar) banata hai, jisme tumhara code + saari dependencies ek hi
+  jar file ke andar pack ho jaati hai — taaki us jar ko kahin bhi le jaake
+  seedha `java -jar app.jar` se chala sako, bina alag se libraries ke
+  dhundhe.
+- **maven-javadoc-plugin** — tumhare code ke comments se documentation
+  (HTML pages) bana deta hai.
+
+Har plugin ko `pom.xml` ke `<build><plugins>` section ke andar likha
+jaata hai, jaise upar pom.xml example mein compiler plugin likha hai.
+
+## Multi-Module Maven Project (ek bade project ke chote hisse)
+
+Jab project bada ho jaata hai (jaise ek app jisme "user-service",
+"order-service", "payment-service" alag-alag parts ho), to sab ko ek hi
+`pom.xml` mein rakhna mushkil ho jaata hai. Isliye Maven **multi-module**
+project banane deta hai:
+
+- Ek **parent** `pom.xml` hota hai (packaging type `pom`), jisme common
+  settings (Java version, shared dependencies) likhe hote hai.
+- Har chota project apna alag folder aur apna `pom.xml` rakhta hai, aur
+  parent ko `<parent>` tag se refer karta hai.
+
+```xml
+<!-- parent pom.xml -->
+<modules>
+    <module>user-service</module>
+    <module>order-service</module>
+</modules>
+```
+
+Isko school ki tarah socho — parent pom **school** hai, aur har module
+ek **class** hai jo school ke common rules follow karti hai lekin apna
+alag kaam bhi karti hai.
+
+## Maven Wrapper (`mvnw`)
+
+Kabhi kabhi tumhare project ko chalane wale ke computer mein Maven
+install hi nahi hota. Us waqt **Maven Wrapper** kaam aata hai — ye ek
+chota script (`mvnw` Mac/Linux ke liye, `mvnw.cmd` Windows ke liye) hai
+jo project ke andar hi aata hai aur khud sahi Maven version download
+karke use kar leta hai, bina tumhare system pe Maven install kiye.
+
+```
+./mvnw clean package     # Mac/Linux
+mvnw.cmd clean package   # Windows
+```
+
+Spring Boot projects (Spring Initializr se generate kiye hue) mein ye
+already included aata hai — isliye tumhe alag se Maven install kiye
+bina bhi project turant chala sakte ho.
+
+## Common `mvn` commands — ek jagah cheat-sheet
+
+| Command | Kya karta hai |
+|---|---|
+| `mvn -version` | Maven ka version check karta hai |
+| `mvn validate` | project structure sahi hai ya nahi check karta hai |
+| `mvn compile` | `.java` ko `.class` mein badalta hai |
+| `mvn test` | unit tests chalata hai |
+| `mvn package` | jar/war bana ke `target/` mein daalta hai |
+| `mvn install` | jar ko local repo (`~/.m2`) mein daalta hai |
+| `mvn clean` | `target/` folder delete karta hai |
+| `mvn clean install` | pehle purana build hata ke naya banata hai |
+| `mvn dependency:tree` | saari dependencies (aur transitive wali bhi) tree ki tarah dikhata hai |
+
 ## AWS pe Maven project kaise set up kare
 
 Ek baar `mvn package` se jar ban jaaye (jaise Spring Boot app ka), to AWS
@@ -432,3 +551,6 @@ bajaye):
    Isse pura directory tree print ho jaata hai, jisse turant confirm ho
    jaata hai ki `src/main/java`, `src/test/java`, aur `pom.xml` sahi jagah
    pe hai jaise Maven expect karta hai.
+
+
+spring intizier
